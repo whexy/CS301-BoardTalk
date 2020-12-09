@@ -138,6 +138,7 @@ int main(void) {
     {
         LCD_ShowString(30, 150, 200, 16, 16, "NRF24L01 TX_Mode");
         NRF24L01_TX_Mode();
+        HAL_UART_Receive_IT(&huart1, (uint8_t *) rxBuffer, 1);
         while (1) {
             LED0 = !LED0;
             delay_ms(1500);
@@ -151,6 +152,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         static unsigned char uLength = 0;
         uRx_Data[uLength++] = rxBuffer[0];
         if (rxBuffer[0] == '\n') {
+            HAL_UART_Transmit(&huart1, uRx_Data, uLength, 0xffff);
             uRx_Data[uLength] = '\0';
             if (NRF24L01_TxPacket(uRx_Data) == TX_OK) {
                 LCD_ShowString(30, 170, 239, 32, 16, "Sent DATA:");
