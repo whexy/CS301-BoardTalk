@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="NRFTest"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="NRFTest.elf">
+				<Option output="/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/NRFTest.elf" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DSTM32F103xE"/>
+					<Add option="-DUSE_HAL_DRIVER"/>
+					<Add option="-DDEBUG"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/CMSIS/Device/ST/STM32F1xx/Include"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/CMSIS/Include"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/include/c++/9.3.1"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/include/c++/9.3.1/arm-none-eabi"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/include/c++/9.3.1/backward"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/include"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/include-fixed"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 NRFTest.elf"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="NRFTest.elf/fast">
+				<Option output="/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/NRFTest.elf" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DSTM32F103xE"/>
+					<Add option="-DUSE_HAL_DRIVER"/>
+					<Add option="-DDEBUG"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/CMSIS/Device/ST/STM32F1xx/Include"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/CMSIS/Include"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy"/>
+					<Add directory="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/include/c++/9.3.1"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/include/c++/9.3.1/arm-none-eabi"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/include/c++/9.3.1/backward"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/include"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/include-fixed"/>
+					<Add directory="/usr/local/Caskroom/gcc-arm-embedded/9-2020-q2-update/gcc-arm-none-eabi-9-2020-q2-update/bin/../lib/gcc/arm-none-eabi/9.3.1/../../../../arm-none-eabi/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 NRFTest.elf/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/24l01.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/FONT.H">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/delay.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/gpio.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/key.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/lcd.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/led.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/main.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/spi.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/stm32f1xx_hal_conf.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/stm32f1xx_it.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/sys.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Inc/usart.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/24l01.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/delay.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/gpio.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/key.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/lcd.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/led.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/main.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/spi.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/stm32f1xx_hal_msp.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/stm32f1xx_it.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/sys.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/syscalls.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/sysmem.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/system_stm32f1xx.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Src/usart.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Core/Startup/startup_stm32f103rctx.s">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_cortex.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_dma_ex.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_exti.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_spi.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/STM32F103RCTX_FLASH.ld">
+			<Option target="NRFTest.elf"/>
+		</Unit>
+		<Unit filename="/Users/macmo/Documents/SUSTech/CS301/NRFTest/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

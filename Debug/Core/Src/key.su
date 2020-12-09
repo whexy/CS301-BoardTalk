@@ -1,0 +1,2 @@
+key.c:17:6:KEY_Init	32	static
+key.c:46:4:KEY_Scan	16	static

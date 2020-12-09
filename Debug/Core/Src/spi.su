@@ -1,0 +1,4 @@
+spi.c:20:6:SPI1_Init	8	static
+spi.c:44:6:HAL_SPI_MspInit	40	static
+spi.c:63:6:SPI1_SetSpeed	16	static
+spi.c:76:4:SPI1_ReadWriteByte	32	static
