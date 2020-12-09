@@ -1,5 +1,6 @@
 #ifndef _LED_H
 #define _LED_H
+
 #include "sys.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
@@ -14,8 +15,9 @@
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	
 
-#define LED0 PAout(8)   	//LED0
-#define LED1 PDout(2)   	//LED1
+#define LED0 PAout(8)    //LED0
+#define LED1 PDout(2)    //LED1
 
 void LED_Init(void);
+
 #endif

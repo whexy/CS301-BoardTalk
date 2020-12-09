@@ -1,5 +1,6 @@
 #ifndef __SPI_H
 #define __SPI_H
+
 #include "sys.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
@@ -17,6 +18,9 @@
 extern SPI_HandleTypeDef SPI1_Handler;  //SPI句柄
 
 void SPI1_Init(void);
+
 void SPI1_SetSpeed(u8 SPI_BaudRatePrescaler);
+
 u8 SPI1_ReadWriteByte(u8 TxData);
+
 #endif

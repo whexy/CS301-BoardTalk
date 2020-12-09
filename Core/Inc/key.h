@@ -1,5 +1,6 @@
 #ifndef _KEY_H
 #define _KEY_H
+
 #include "sys.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
@@ -24,10 +25,12 @@
 #define KEY1        HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_15) //KEY1按键PA15
 #define WK_UP       HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0)  //WKUP按键PA0
 
-#define KEY0_PRES 	1
-#define KEY1_PRES	2
+#define KEY0_PRES    1
+#define KEY1_PRES    2
 #define WKUP_PRES   3
 
 void KEY_Init(void);
+
 u8 KEY_Scan(u8 mode);
+
 #endif

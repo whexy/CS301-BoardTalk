@@ -1,5 +1,6 @@
 #ifndef __24L01_H
 #define __24L01_H
+
 #include "sys.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
@@ -26,7 +27,7 @@
 #define NOP             0xFF  //空操作,可以用来读状态寄存器	 
 //SPI(NRF24L01)寄存器地址
 #define CONFIG          0x00  //配置寄存器地址;bit0:1接收模式,0发射模式;bit1:电选择;bit2:CRC模式;bit3:CRC使能;
-                              //bit4:中断MAX_RT(达到最大重发次数中断)使能;bit5:中断TX_DS使能;bit6:中断RX_DR使能
+//bit4:中断MAX_RT(达到最大重发次数中断)使能;bit5:中断TX_DS使能;bit6:中断RX_DR使能
 #define EN_AA           0x01  //使能自动应答功能  bit0~5,对应通道0~5
 #define EN_RXADDR       0x02  //接收地址允许,bit0~5,对应通道0~5
 #define SETUP_AW        0x03  //设置地址宽度(所有数据通道):bit1,0:00,3字节;01,4字节;02,5字节;
@@ -34,10 +35,10 @@
 #define RF_CH           0x05  //RF通道,bit6:0,工作通道频率;
 #define RF_SETUP        0x06  //RF寄存器;bit3:传输速率(0:1Mbps,1:2Mbps);bit2:1,发射功率;bit0:低噪声放大器增益
 #define STATUS          0x07  //状态寄存器;bit0:TX FIFO满标志;bit3:1,接收数据通道号(最大:6);bit4,达到最多次重发
-                              //bit5:数据发送完成中断;bit6:接收数据中断;
-#define MAX_TX  		0x10  //达到最大发送次数中断
-#define TX_OK   		0x20  //TX发送完成中断
-#define RX_OK   		0x40  //接收到数据中断
+//bit5:数据发送完成中断;bit6:接收数据中断;
+#define MAX_TX        0x10  //达到最大发送次数中断
+#define TX_OK        0x20  //TX发送完成中断
+#define RX_OK        0x40  //接收到数据中断
 
 #define OBSERVE_TX      0x08  //发送检测寄存器,bit7:4,数据包丢失计数器;bit3:0,重发计数器
 #define CD              0x09  //载波检测寄存器,bit0,载波检测;
@@ -55,7 +56,7 @@
 #define RX_PW_P4        0x15  //接收数据通道4有效数据宽度(1~32字节),设置为0则非法
 #define RX_PW_P5        0x16  //接收数据通道5有效数据宽度(1~32字节),设置为0则非法
 #define NRF_FIFO_STATUS 0x17  //FIFO状态寄存器;bit0,RX FIFO寄存器空标志;bit1,RX FIFO满标志;bit2,3,保留
-                              //bit4,TX FIFO空标志;bit5,TX FIFO满标志;bit6,1,循环发送上一数据包.0,不循环;
+//bit4,TX FIFO空标志;bit5,TX FIFO满标志;bit6,1,循环发送上一数据包.0,不循环;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //24L01操作线
 #define NRF24L01_CE     PAout(4)  //24L01片选信号
@@ -63,18 +64,18 @@
 #define NRF24L01_IRQ    PAin(1)   //IRQ主机数据输入
 
 //24L01发送接收数据宽度定义
-#define TX_ADR_WIDTH    5   	//5字节的地址宽度
-#define RX_ADR_WIDTH    5   	//5字节的地址宽度
-#define TX_PLOAD_WIDTH  32  	//32字节的用户数据宽度
-#define RX_PLOAD_WIDTH  32  	//32字节的用户数据宽度
-									   	   
+#define TX_ADR_WIDTH    5    //5字节的地址宽度
+#define RX_ADR_WIDTH    5    //5字节的地址宽度
+#define TX_PLOAD_WIDTH  32    //32字节的用户数据宽度
+#define RX_PLOAD_WIDTH  32    //32字节的用户数据宽度
+
 
 void NRF24L01_Init(void);//初始化
 void NRF24L01_RX_Mode(void);//配置为接收模式
 void NRF24L01_TX_Mode(void);//配置为发送模式
 u8 NRF24L01_Write_Buf(u8 reg, u8 *pBuf, u8 u8s);//写数据区
 u8 NRF24L01_Read_Buf(u8 reg, u8 *pBuf, u8 u8s);//读数据区		  
-u8 NRF24L01_Read_Reg(u8 reg);			//读寄存器
+u8 NRF24L01_Read_Reg(u8 reg);            //读寄存器
 u8 NRF24L01_Write_Reg(u8 reg, u8 value);//写寄存器
 u8 NRF24L01_Check(void);//检查24L01是否存在
 u8 NRF24L01_TxPacket(u8 *txbuf);//发送一个包的数据
