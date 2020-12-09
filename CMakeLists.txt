@@ -46,7 +46,7 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include Core/Inc Drivers/STM32F1xx_HAL_Driver/Inc/Legacy Drivers/STM32F1xx_HAL_Driver/Inc)
+include_directories(Core/Inc Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include Core/Inc Drivers/STM32F1xx_HAL_Driver/Inc/Legacy Drivers/STM32F1xx_HAL_Driver/Inc)
 
 add_definitions(-DSTM32F103xE -DUSE_HAL_DRIVER -DDEBUG)
 

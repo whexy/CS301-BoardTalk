@@ -42,7 +42,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-uint8_t rxBuffer[20];
+extern uint8_t rxBuffer[20];
 
 /* USER CODE END PV */
 
