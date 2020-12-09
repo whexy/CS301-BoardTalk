@@ -1,3 +1,4 @@
+#include "stdio.h"
 #include "lcd.h"
 #include "stdlib.h"
 #include "font.h"
