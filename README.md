@@ -2,5 +2,5 @@
 
 Final project of SUSTech CS301 (Embedded System and Microcomputer principle)
 
-Authors: Wenxuan SHI, Weijie Huang, Chuan JIANG, Qing ZHANG
+Authors: Wenxuan SHI, Weijie HUANG, Chuan JIANG, Qing ZHANG
 
