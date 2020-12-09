@@ -133,35 +133,36 @@ int main(void) {
                 t = 0;
                 LED0 = !LED0;
             }
-        };
+        }
     } else//TX模式
     {
         LCD_ShowString(30, 150, 200, 16, 16, "NRF24L01 TX_Mode");
         NRF24L01_TX_Mode();
-        mode = 'A';//从空格键开始
         while (1) {
-            if (NRF24L01_TxPacket(tmp_buf) == TX_OK) {
-                LCD_ShowString(30, 170, 239, 32, 16, "Sended DATA:");
-                LCD_ShowString(0, 190, lcddev.width - 1, 32, 16, tmp_buf);
-                key = mode;
-                for (t = 0; t < 32; t++) {
-                    key++;
-                    if (key > ('Z'))key = 'A';
-                    tmp_buf[t] = key;
-                }
-                mode++;
-                if (mode > 'Z')mode = 'A';
-                tmp_buf[32] = 0;//加入结束符
-            } else {
-                LCD_Fill(0, 170, lcddev.width, 170 + 16 * 3, WHITE);//清空显示
-                LCD_ShowString(30, 170, lcddev.width - 1, 32, 16, "Send Failed ");
-            };
             LED0 = !LED0;
             delay_ms(1500);
-        };
+        }
     }
 }
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart->Instance == USART1) {
+        static unsigned char uRx_Data[1024] = {0};
+        static unsigned char uLength = 0;
+        uRx_Data[uLength++] = rxBuffer[0];
+        if (rxBuffer[0] == '\n') {
+            uRx_Data[uLength] = '\0';
+            if (NRF24L01_TxPacket(uRx_Data) == TX_OK) {
+                LCD_ShowString(30, 170, 239, 32, 16, "Sent DATA:");
+                LCD_ShowString(0, 190, lcddev.width - 1, 32, 16, uRx_Data);
+            } else {
+                LCD_Fill(0, 170, lcddev.width, 170 + 16 * 3, WHITE);//清空显示
+                LCD_ShowString(30, 170, lcddev.width - 1, 32, 16, "Send Failed ");
+            }
+            uLength = 0;
+        }
+    }
+}
 
 /* USER CODE END 4 */
 
