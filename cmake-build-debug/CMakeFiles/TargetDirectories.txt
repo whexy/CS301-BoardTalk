@@ -1,3 +1,0 @@
-/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/macmo/Documents/SUSTech/CS301/NRFTest/cmake-build-debug/CMakeFiles/NRFTest.elf.dir
