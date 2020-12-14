@@ -61,17 +61,16 @@ void screen_write_lalign(const char *msg, uint16_t color) {
 void screen_write_ralign(const char *msg, uint16_t color) {
     static char buf[BUFFER_SIZE];
     static char tmp[LINE_CHARS];
+    memset(buf, 0, sizeof(buf));
     char *p = buf;
     uint len = strlen(msg);
     strncpy(buf, msg, len);
-    msg += len;
-    while (p + LINE_CHARS < msg) {
+    while (p + LINE_CHARS < buf + len) {
         p += LINE_CHARS;
     }
-    msg -= len;
     strcpy(tmp, p);
     sprintf(p, RALIGN, tmp);
-    screen_write(msg, color);
+    screen_write(buf, color);
     strcpy(p, tmp);
 }
 
