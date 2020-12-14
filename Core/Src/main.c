@@ -20,9 +20,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "spi.h"
-#include "usart.h"
-#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -31,8 +28,8 @@
 #include "usart.h"
 #include "led.h"
 #include "key.h"
-#include "lcd.h"
 #include "24l01.h"
+#include "screen.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -82,21 +79,20 @@ int main(void) {
     //	uart_init(115200);					//初始化串口
     LED_Init();                            //初始化LED
     KEY_Init();                            //初始化按键
-    LCD_Init();                            //初始化LCD
+//    LCD_Init();                            //初始化LCD
+    screen_init();
     NRF24L01_Init();                    //初始化NRF24L01
 
-    POINT_COLOR = RED;
-    LCD_ShowString(30, 50, 200, 16, 16, "Mini STM32");
-    LCD_ShowString(30, 70, 200, 16, 16, "NRF24L01 TEST");
-    LCD_ShowString(30, 90, 200, 16, 16, "ATOM@ALIENTEK");
-    LCD_ShowString(30, 110, 200, 16, 16, "2019/11/15");
+    screen_write_lalign("NRF24L01 Test", RED);
+    screen_update();
     while (NRF24L01_Check()) {
-        LCD_ShowString(30, 130, 200, 16, 16, "NRF24L01 Error");
-        delay_ms(200);
-        LCD_Fill(30, 130, 239, 130 + 16, WHITE);
-        delay_ms(200);
+        screen_write_ralign("Checking NRF24L01...", RED);
+        screen_update();
+        delay_ms(400);
     }
-    LCD_ShowString(30, 130, 200, 16, 16, "NRF24L01 OK");
+    screen_write_ralign("NRF24L01 OK", GREEN);
+    screen_write_ralign("KEY0:RX_Mode  KEY1:TX_Mode", GREEN);
+    screen_update();
     while (1) {
         key = KEY_Scan(0);
         if (key == KEY0_PRES) {
@@ -107,25 +103,29 @@ int main(void) {
             break;
         }
         t++;
-        if (t == 100)LCD_ShowString(10, 150, 230, 16, 16, "KEY0:RX_Mode  KEY1:TX_Mode"); //闪烁显示提示信息
-        if (t == 200) {
-            LCD_Fill(10, 150, 230, 150 + 16, WHITE);
-            t = 0;
-        }
+//        if (t == 100)LCD_ShowString(10, 150, 230, 16, 16, "KEY0:RX_Mode  KEY1:TX_Mode"); //闪烁显示提示信息
+//        if (t == 200) {
+//            LCD_Fill(10, 150, 230, 150 + 16, WHITE);
+//            t = 0;
+//        }
         delay_ms(5);
     }
-    LCD_Fill(10, 150, 240, 166, WHITE);//清空上面的显示
-    POINT_COLOR = BLUE;//设置字体为蓝色
+//    LCD_Fill(10, 150, 240, 166, WHITE);//清空上面的显示
+//    POINT_COLOR = BLUE;//设置字体为蓝色
     if (mode == 0)//RX模式
     {
-        LCD_ShowString(30, 150, 200, 16, 16, "NRF24L01 RX_Mode");
-        LCD_ShowString(30, 170, 200, 16, 16, "Received DATA:");
+//        LCD_ShowString(30, 150, 200, 16, 16, "NRF24L01 RX_Mode");
+//        LCD_ShowString(30, 170, 200, 16, 16, "Received DATA:");
+        screen_write_ralign("NRF24L01 RX_Mode", BLUE);
+        screen_update();
         NRF24L01_RX_Mode();
         while (1) {
             if (NRF24L01_RxPacket(tmp_buf) == 0)//一旦接收到信息,则显示出来.
             {
                 tmp_buf[32] = 0;//加入字符串结束符
-                LCD_ShowString(0, 190, lcddev.width - 1, 32, 16, tmp_buf);
+                screen_write_ralign(tmp_buf, BLUE);
+                screen_update();
+//                LCD_ShowString(0, 190, lcddev.width - 1, 32, 16, tmp_buf);
             } else delay_us(100);
             t++;
             if (t == 10000)//大约1s钟改变一次状态
@@ -136,7 +136,9 @@ int main(void) {
         }
     } else//TX模式
     {
-        LCD_ShowString(30, 150, 200, 16, 16, "NRF24L01 TX_Mode");
+//        LCD_ShowString(30, 150, 200, 16, 16, "NRF24L01 TX_Mode");
+        screen_write_ralign("NRF24L01 TX_Mode", BLUE);
+        screen_update();
         NRF24L01_TX_Mode();
         HAL_UART_Receive_IT(&huart1, (uint8_t *) rxBuffer, 1);
         while (1) {
@@ -155,12 +157,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
             HAL_UART_Transmit(&huart1, uRx_Data, uLength, 0xffff);
             uRx_Data[uLength] = '\0';
             if (NRF24L01_TxPacket(uRx_Data) == TX_OK) {
-                LCD_ShowString(30, 170, 239, 32, 16, "Sent DATA:");
-                LCD_ShowString(0, 190, lcddev.width - 1, 32, 16, uRx_Data);
+                screen_write_ralign((const char *) uRx_Data, BLUE);
+//                LCD_ShowString(30, 170, 239, 32, 16, "Sent DATA:");
+//                LCD_ShowString(0, 190, lcddev.width - 1, 32, 16, uRx_Data);
             } else {
-                LCD_Fill(0, 170, lcddev.width, 170 + 16 * 3, WHITE);//清空显示
-                LCD_ShowString(30, 170, lcddev.width - 1, 32, 16, "Send Failed ");
+                screen_write_ralign("Send failed", RED);
+//                LCD_Fill(0, 170, lcddev.width, 170 + 16 * 3, WHITE);//清空显示
+//                LCD_ShowString(30, 170, lcddev.width - 1, 32, 16, "Send Failed ");
             }
+            screen_update();
             uLength = 0;
         }
     }
