@@ -10,8 +10,6 @@
 
 // Screen wrapper macros
 
-#define STR(X) #X
-#define AS_STR(X) STR(X)
 #define BUFFER_SIZE 4096
 #define FONT_SIZE 12
 #define LINE_CNT 19

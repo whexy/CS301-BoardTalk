@@ -1,7 +1,8 @@
 #ifndef __24L01_H
 #define __24L01_H
 
-#include "sys.h"
+//#include "sys.h"
+#include "main.h"
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F103开发板
@@ -69,16 +70,18 @@
 #define TX_PLOAD_WIDTH  32    //32字节的用户数据宽度
 #define RX_PLOAD_WIDTH  32    //32字节的用户数据宽度
 
+extern uint8_t TX_ADDRESS[TX_ADR_WIDTH];
+extern uint8_t RX_ADDRESS[RX_ADR_WIDTH];
 
 void NRF24L01_Init(void);//初始化
 void NRF24L01_RX_Mode(void);//配置为接收模式
 void NRF24L01_TX_Mode(void);//配置为发送模式
-u8 NRF24L01_Write_Buf(u8 reg, u8 *pBuf, u8 u8s);//写数据区
-u8 NRF24L01_Read_Buf(u8 reg, u8 *pBuf, u8 u8s);//读数据区		  
-u8 NRF24L01_Read_Reg(u8 reg);            //读寄存器
-u8 NRF24L01_Write_Reg(u8 reg, u8 value);//写寄存器
-u8 NRF24L01_Check(void);//检查24L01是否存在
-u8 NRF24L01_TxPacket(u8 *txbuf);//发送一个包的数据
-u8 NRF24L01_RxPacket(u8 *rxbuf);//接收一个包的数据
+uint8_t NRF24L01_Write_Buf(uint8_t reg, uint8_t *pBuf, uint8_t uint8_ts);//写数据区
+uint8_t NRF24L01_Read_Buf(uint8_t reg, uint8_t *pBuf, uint8_t uint8_ts);//读数据区
+uint8_t NRF24L01_Read_Reg(uint8_t reg);            //读寄存器
+uint8_t NRF24L01_Write_Reg(uint8_t reg, uint8_t value);//写寄存器
+uint8_t NRF24L01_Check(void);//检查24L01是否存在
+uint8_t NRF24L01_TxPacket(uint8_t *txbuf);//发送一个包的数据
+uint8_t NRF24L01_RxPacket(uint8_t *rxbuf);//接收一个包的数据
 
 #endif

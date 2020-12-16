@@ -20,16 +20,14 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
+#include "usart.h"
+#include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "sys.h"
-#include "delay.h"
-#include "usart.h"
-#include "led.h"
-#include "key.h"
-#include "24l01.h"
 #include "screen.h"
+#include "msg.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,7 +41,8 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+//#define __DEBUG
+//#define __RX_DEBUG
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -60,7 +59,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint8_t conn_status = CONN_OFF, is_stable = 1;
+char rx_buf[RX_PLOAD_WIDTH + 1];
 /* USER CODE END 0 */
 
 /**
@@ -68,86 +68,137 @@ void SystemClock_Config(void);
   * @retval int
   */
 int main(void) {
-    u8 key, mode;
-    u16 t = 0;
-    u8 tmp_buf[33];
+    /* USER CODE BEGIN 1 */
+    /* USER CODE END 1 */
 
-    HAL_Init();                            //初始化HAL库
-    Stm32_Clock_Init(RCC_PLL_MUL9);    //设置时钟,72M
-    delay_init(72);                    //初始化延时函数
+    /* MCU Configuration--------------------------------------------------------*/
+
+    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+    HAL_Init();
+
+    /* USER CODE BEGIN Init */
+
+    /* USER CODE END Init */
+
+    /* Configure the system clock */
+    SystemClock_Config();
+
+    /* USER CODE BEGIN SysInit */
+
+    /* USER CODE END SysInit */
+
+    /* Initialize all configured peripherals */
+    MX_GPIO_Init();
     MX_USART1_UART_Init();
-    //	uart_init(115200);					//初始化串口
-    LED_Init();                            //初始化LED
-    KEY_Init();                            //初始化按键
-//    LCD_Init();                            //初始化LCD
+    MX_TIM3_Init();
+    /* USER CODE BEGIN 2 */
     screen_init();
-    NRF24L01_Init();                    //初始化NRF24L01
+    conn_init();
+    screen_clear();
+    /* USER CODE END 2 */
 
-    screen_write_lalign("NRF24L01 Test", RED);
-    screen_update();
-    while (NRF24L01_Check()) {
-        screen_write_ralign("Checking NRF24L01...", RED);
-        screen_update();
-        delay_ms(400);
-    }
-    screen_write_ralign("NRF24L01 OK", GREEN);
-    screen_write_ralign("KEY0:RX_Mode  KEY1:TX_Mode", GREEN);
-    screen_update();
+    /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
+#ifdef __DEBUG
+#ifdef __RX_DEBUG
+    int k = 0;
     while (1) {
-        key = KEY_Scan(0);
-        if (key == KEY0_PRES) {
-            mode = 0;
-            break;
-        } else if (key == KEY1_PRES) {
-            mode = 1;
-            break;
+        if (SEND_MSG("Hello world") == PKG_TX_OK) {
+            screen_write_ralign("SENT", (k % 3 == 0) ? BLACK : ((k % 3 == 1) ? RED : BLUE));
+        } else {
+            screen_write_ralign("SEND FAILED", (k % 3 == 0) ? BLACK : ((k % 3 == 1) ? RED : BLUE));
         }
-        t++;
-//        if (t == 100)LCD_ShowString(10, 150, 230, 16, 16, "KEY0:RX_Mode  KEY1:TX_Mode"); //闪烁显示提示信息
-//        if (t == 200) {
-//            LCD_Fill(10, 150, 230, 150 + 16, WHITE);
-//            t = 0;
-//        }
-        delay_ms(5);
-    }
-//    LCD_Fill(10, 150, 240, 166, WHITE);//清空上面的显示
-//    POINT_COLOR = BLUE;//设置字体为蓝色
-    if (mode == 0)//RX模式
-    {
-//        LCD_ShowString(30, 150, 200, 16, 16, "NRF24L01 RX_Mode");
-//        LCD_ShowString(30, 170, 200, 16, 16, "Received DATA:");
-        screen_write_ralign("NRF24L01 RX_Mode", BLUE);
         screen_update();
-        NRF24L01_RX_Mode();
-        while (1) {
-            if (NRF24L01_RxPacket(tmp_buf) == 0)//一旦接收到信息,则显示出来.
-            {
-                tmp_buf[32] = 0;//加入字符串结束符
-                screen_write_ralign(tmp_buf, BLUE);
+        ++k;
+        HAL_Delay(200);
+    }
+#else
+    int k = 0;
+    while (1) {
+        if (pkg_recv(rx_buf) != EMPTY) {
+            screen_write_ralign(rx_buf, (k % 3 == 0) ? BLACK : ((k % 3 == 1) ? RED : BLUE));
+            screen_update();
+        }
+        ++k;
+        HAL_Delay(200);
+    }
+#endif // __RX_DEBUG
+#else
+    screen_write_lalign("NRF24L01 OK", BLUE);
+    screen_write_ralign("KEY0:Connect  KEY1:Disconnect", GREEN);
+    screen_update();
+    HAL_Delay(1000);
+    while (1) {
+        if (conn_status == CONN_ON) {
+            switch (pkg_recv(rx_buf)) {
+                case MSG_TYPE:
+                    screen_write_lalign(rx_buf, BLACK);
+                    is_stable = 1;
+                    break;
+                case FIN_TYPE:
+                    if (SEND_FIN() == PKG_TX_OK) {
+                        conn_status = CONN_OFF;
+                        screen_write_ralign("Disconnected", RED);
+                        screen_update();
+                    }
+                    break;
+                case ERR_TYPE:
+                    is_stable = 0;
+                    break;
+                default:
+                    break;
+            }
+        } else if (conn_status == CONN_OFF && pkg_recv(rx_buf) == SYN_TYPE) {
+            if (SEND_SYN() == PKG_TX_OK) {
+                conn_status = CONN_ON;
+                screen_write_ralign("connected", RED);
                 screen_update();
-//                LCD_ShowString(0, 190, lcddev.width - 1, 32, 16, tmp_buf);
-            } else delay_us(100);
-            t++;
-            if (t == 10000)//大约1s钟改变一次状态
-            {
-                t = 0;
-                LED0 = !LED0;
             }
         }
-    } else//TX模式
-    {
-//        LCD_ShowString(30, 150, 200, 16, 16, "NRF24L01 TX_Mode");
-        screen_write_ralign("NRF24L01 TX_Mode", BLUE);
-        screen_update();
-        NRF24L01_TX_Mode();
-        HAL_UART_Receive_IT(&huart1, (uint8_t *) rxBuffer, 1);
-        while (1) {
-            LED0 = !LED0;
-            delay_ms(1500);
-        }
+        HAL_Delay(100);
+        /* USER CODE END WHILE */
+
+        /* USER CODE BEGIN 3 */
+    }
+#endif // __DEBUG
+    /* USER CODE END 3 */
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void) {
+    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+    /** Initializes the CPU, AHB and APB busses clocks
+    */
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+    RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+        Error_Handler();
+    }
+    /** Initializes the CPU, AHB and APB busses clocks
+    */
+    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+                                  | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
+        Error_Handler();
     }
 }
 
+/* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart->Instance == USART1) {
         static unsigned char uRx_Data[1024] = {0};
@@ -155,15 +206,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         uRx_Data[uLength++] = rxBuffer[0];
         if (rxBuffer[0] == '\n') {
             HAL_UART_Transmit(&huart1, uRx_Data, uLength, 0xffff);
-            uRx_Data[uLength] = '\0';
-            if (NRF24L01_TxPacket(uRx_Data) == TX_OK) {
+            uRx_Data[uLength - 1] = '\0';
+            if (SEND_MSG((char *) uRx_Data) == PKG_TX_OK) {
                 screen_write_ralign((const char *) uRx_Data, BLUE);
-//                LCD_ShowString(30, 170, 239, 32, 16, "Sent DATA:");
-//                LCD_ShowString(0, 190, lcddev.width - 1, 32, 16, uRx_Data);
             } else {
                 screen_write_ralign("Send failed", RED);
-//                LCD_Fill(0, 170, lcddev.width, 170 + 16 * 3, WHITE);//清空显示
-//                LCD_ShowString(30, 170, lcddev.width - 1, 32, 16, "Send Failed ");
             }
             screen_update();
             uLength = 0;
@@ -171,6 +218,76 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     }
 }
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    int i;
+    HAL_Delay(400);
+    switch (GPIO_Pin) {
+        case GPIO_PIN_5:
+            if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == GPIO_PIN_RESET) {
+                screen_write_lalign("KEY0", BLUE);
+                screen_update();
+                if (conn_status == CONN_OFF) {
+                    screen_write_lalign("CONN: OFF->PENDING", BLUE);
+                    screen_update();
+                    conn_status = CONN_PENDING;
+                    for (i = 10; i > 0; i--) {
+                        if (conn_create(NULL, NULL) == CONN_ON) {
+                            break;
+                        }
+                    }
+                    if (i == 0) {
+                        conn_status = CONN_OFF;
+                        screen_write_lalign("CONN: PENDING->OFF", BLUE);
+                        screen_update();
+                    } else {
+                        conn_status = CONN_ON;
+                        screen_write_ralign("connected", RED);
+                        screen_update();
+                    }
+                }
+            }
+            break;
+        case GPIO_PIN_15:
+            if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET) {
+                screen_write_lalign("KEY1", BLUE);
+                screen_update();
+                if (conn_status == CONN_ON) {
+                    screen_write_lalign("CONN: OFF->PENDING", BLUE);
+                    screen_update();
+                    conn_status = CONN_AWAIT;
+                    for (i = 10; i > 0; --i) {
+                        if (conn_close() == CONN_OFF) {
+                            break;
+                        }
+                    }
+                    if (i == 0) {
+                        screen_write_lalign("CONN: FORCE OFF", RED);
+                        screen_update();
+                        // Report ERROR?
+                    }
+                    // Force close?
+                    conn_status = CONN_OFF;
+                    screen_write_ralign("Disconnected", RED);
+                    screen_update();
+                }
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    if (htim->Instance == TIM3) {
+        if (conn_status == CONN_ON) {
+            if (SEND_BEAT() == PKG_TX_OK) {
+                is_stable = 1;
+            } else {
+                is_stable = 0;
+            }
+        }
+    }
+}
 /* USER CODE END 4 */
 
 /**
@@ -193,7 +310,7 @@ void Error_Handler(void) {
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */

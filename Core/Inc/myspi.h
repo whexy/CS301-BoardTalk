@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : gpio.h
-  * Description        : This file contains all the functions prototypes for
-  *                      the gpio
+  * File Name          : SPI.h
+  * Description        : This file provides code for the configuration
+  *                      of the SPI instances.
   ******************************************************************************
   * @attention
   *
@@ -16,10 +16,9 @@
   *
   ******************************************************************************
   */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __gpio_H
-#define __gpio_H
+#ifndef __spi_H
+#define __spi_H
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -31,11 +30,17 @@
 
 /* USER CODE END Includes */
 
+extern SPI_HandleTypeDef hspi1;
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_GPIO_Init(void);
+void MX_SPI1_Init(void);
+
+void SPI1_SetSpeed(uint8_t SPI_BaudRatePrescaler);
+
+uint8_t SPI1_ReadWriteByte(uint8_t TxData);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -44,7 +49,7 @@ void MX_GPIO_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ pinoutConfig_H */
+#endif /*__ spi_H */
 
 /**
   * @}

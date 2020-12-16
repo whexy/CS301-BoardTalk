@@ -47,7 +47,8 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#define STR(X) #X
+#define AS_STR(X) STR(X)
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
