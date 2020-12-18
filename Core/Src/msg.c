@@ -37,9 +37,14 @@ conn_type_typedef conn_create(const uint8_t *rx_addr, const uint8_t *tx_addr) {
         screen_update();
         for (i = 10; i > 0; --i) {
             do {
+                screen_write_lalign("RECVING", RED);
+                screen_update();
                 rx_status = pkg_recv(buf);
-                HAL_Delay(100);
+                screen_write_lalign("GOT A PKG", RED);
+                screen_update();
             } while (rx_status == EMPTY);
+            screen_write_lalign("OUT LOOP", RED);
+            screen_update();
             if (rx_status == SYN_TYPE) {
                 break;
             }
@@ -77,8 +82,8 @@ pkg_type_typedef pkg_recv(char *buf) {
     NRF24L01_RX_Mode();
     memset(buf, 0, RX_PLOAD_WIDTH * sizeof(char));
     if (NRF24L01_RxPacket((uint8_t *) raw_buf)) {
-        screen_write_lalign("<EMPTY>", GREEN);
-        screen_update();
+//        screen_write_lalign("<EMPTY>", GREEN);
+//        screen_update();
         return EMPTY;
     }
     screen_write_lalign(raw_buf, GREEN);
@@ -114,12 +119,16 @@ conn_type_typedef conn_close(void) {
     int i;
     pkg_type_typedef rx_status;
     char buf[RX_PLOAD_WIDTH + 1];
-    if (SEND_FIN() == FIN_TYPE) {
+    if (SEND_FIN() == PKG_TX_OK) {
         screen_write_lalign("FIN OK", GREEN);
         screen_update();
         for (i = 10; i > 0; --i) {
             do {
+                screen_write_lalign("RECVING", RED);
+                screen_update();
                 rx_status = pkg_recv(buf);
+                screen_write_lalign("GOT A PKG", RED);
+                screen_update();
             } while (rx_status == EMPTY);
             if (rx_status == FIN_TYPE) {
                 break;

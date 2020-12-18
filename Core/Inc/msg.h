@@ -60,9 +60,9 @@ pkg_type_typedef pkg_recv(char *buf);
 
 conn_type_typedef conn_close(void);
 
-#define SEND_SYN() pkg_transmit(SYN_BODY, SYN_TYPE)
-#define SEND_BEAT() pkg_transmit(BEAT_BODY, BEAT_TYPE)
-#define SEND_MSG(msg) pkg_transmit((msg), MSG_TYPE)
-#define SEND_FIN() pkg_transmit(FIN_BODY, FIN_TYPE)
+#define SEND_SYN() (pkg_tx_typedef) pkg_transmit(SYN_BODY, SYN_TYPE)
+#define SEND_BEAT() (pkg_tx_typedef) pkg_transmit(BEAT_BODY, BEAT_TYPE)
+#define SEND_MSG(msg) (pkg_tx_typedef) pkg_transmit((msg), MSG_TYPE)
+#define SEND_FIN() (pkg_tx_typedef) pkg_transmit(FIN_BODY, FIN_TYPE)
 
 #endif //NRFTEST_MSG_H

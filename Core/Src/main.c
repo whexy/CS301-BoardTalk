@@ -37,12 +37,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+//#define __DEBUG
+//#define __RX_DEBUG
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-//#define __DEBUG
-//#define __RX_DEBUG
+#define HEARTBEAT_TIMEOUT 1000
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
@@ -63,12 +64,16 @@ uint8_t conn_status = CONN_OFF, is_stable = 1;
 char rx_buf[RX_PLOAD_WIDTH + 1];
 /* USER CODE END 0 */
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
 /**
   * @brief  The application entry point.
   * @retval int
   */
 int main(void) {
     /* USER CODE BEGIN 1 */
+    int rx_status;
+    uint32_t prev_tick, cur_tick;
     /* USER CODE END 1 */
 
     /* MCU Configuration--------------------------------------------------------*/
@@ -127,12 +132,15 @@ int main(void) {
     screen_write_lalign("NRF24L01 OK", BLUE);
     screen_write_ralign("KEY0:Connect  KEY1:Disconnect", GREEN);
     screen_update();
-    HAL_Delay(1000);
+    HAL_UART_Receive_IT(&huart1, rxBuffer, 1);
+    prev_tick = HAL_GetTick();
     while (1) {
+        rx_status = pkg_recv(rx_buf);
         if (conn_status == CONN_ON) {
-            switch (pkg_recv(rx_buf)) {
+            switch (rx_status) {
                 case MSG_TYPE:
                     screen_write_lalign(rx_buf, BLACK);
+                    screen_update();
                     is_stable = 1;
                     break;
                 case FIN_TYPE:
@@ -148,12 +156,32 @@ int main(void) {
                 default:
                     break;
             }
-        } else if (conn_status == CONN_OFF && pkg_recv(rx_buf) == SYN_TYPE) {
-            if (SEND_SYN() == PKG_TX_OK) {
-                conn_status = CONN_ON;
-                screen_write_ralign("connected", RED);
+        } else if (conn_status == CONN_OFF && rx_status == SYN_TYPE) {
+            while (SEND_SYN() != PKG_TX_OK) {
+                screen_write_lalign("I can't SYN back!!!", RED);
                 screen_update();
+                HAL_Delay(100);
             }
+            conn_status = CONN_ON;
+            screen_write_ralign("connected", RED);
+            screen_update();
+        }
+        cur_tick = HAL_GetTick();
+        if (cur_tick - prev_tick >= HEARTBEAT_TIMEOUT) {
+            if (conn_status == CONN_ON) {
+                screen_write_lalign("SEND BEAT", BLUE);
+                screen_update();
+                if (SEND_BEAT() == PKG_TX_OK) {
+                    screen_write_lalign("BEAT OK", MAGENTA);
+                    screen_update();
+                    is_stable = 1;
+                } else {
+                    screen_write_lalign("BEAT ERR", RED);
+                    screen_update();
+                    is_stable = 0;
+                }
+            }
+            prev_tick = cur_tick;
         }
         HAL_Delay(100);
         /* USER CODE END WHILE */
@@ -163,6 +191,7 @@ int main(void) {
 #endif // __DEBUG
     /* USER CODE END 3 */
 }
+#pragma clang diagnostic pop
 
 /**
   * @brief System Clock Configuration
@@ -204,9 +233,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         static unsigned char uRx_Data[1024] = {0};
         static unsigned char uLength = 0;
         uRx_Data[uLength++] = rxBuffer[0];
+        HAL_UART_Transmit(&huart1, rxBuffer, 1, 0xffff);
         if (rxBuffer[0] == '\n') {
-            HAL_UART_Transmit(&huart1, uRx_Data, uLength, 0xffff);
-            uRx_Data[uLength - 1] = '\0';
+            if (uRx_Data[uLength - 1] == '\r') {
+                uRx_Data[uLength - 1] = '\0';
+            } else {
+                uRx_Data[uLength] = '\0';
+            }
             if (SEND_MSG((char *) uRx_Data) == PKG_TX_OK) {
                 screen_write_ralign((const char *) uRx_Data, BLUE);
             } else {
@@ -220,7 +253,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     int i;
-    HAL_Delay(400);
+//    HAL_Delay(400);
     switch (GPIO_Pin) {
         case GPIO_PIN_5:
             if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == GPIO_PIN_RESET) {
@@ -278,11 +311,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+    screen_write_lalign("TIM", BLUE);
+    screen_update();
     if (htim->Instance == TIM3) {
         if (conn_status == CONN_ON) {
+            screen_write_lalign("SEND BEAT", BLUE);
+            screen_update();
             if (SEND_BEAT() == PKG_TX_OK) {
+                screen_write_lalign("BEAT OK", MAGENTA);
+                screen_update();
                 is_stable = 1;
             } else {
+                screen_write_lalign("BEAT ERR", RED);
+                screen_update();
                 is_stable = 0;
             }
         }
