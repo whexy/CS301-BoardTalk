@@ -26,6 +26,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdio.h>
+#include <string.h>
+#include <inttypes.h>
 #include "screen.h"
 #include "msg.h"
 /* USER CODE END Includes */
@@ -38,7 +41,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 //#define __DEBUG
-//#define __RX_DEBUG
+//#define __TX_DEBUG
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -54,18 +57,28 @@ uint8_t rxBuffer[20];
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
 
+/* USER CODE BEGIN PFP */
+void exec_command(const char *cmd);
+
+int handle_conn_create(void);
+
+int handle_conn_close(void);
+
+void show_address(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t conn_status = CONN_OFF, is_stable = 1;
+uint8_t conn_status = CONN_OFF;
+int is_stable = 1;
+int beat_cnt = 0;
 char rx_buf[RX_PLOAD_WIDTH + 1];
 /* USER CODE END 0 */
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -73,7 +86,7 @@ char rx_buf[RX_PLOAD_WIDTH + 1];
 int main(void) {
     /* USER CODE BEGIN 1 */
     int rx_status;
-    uint32_t prev_tick, cur_tick;
+    uint32_t prev_tick, cur_tick, last_beat_tick;
     /* USER CODE END 1 */
 
     /* MCU Configuration--------------------------------------------------------*/
@@ -100,12 +113,14 @@ int main(void) {
     screen_init();
     conn_init();
     screen_clear();
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
     /* USER CODE END 2 */
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
 #ifdef __DEBUG
-#ifdef __RX_DEBUG
+#ifdef __TX_DEBUG
     int k = 0;
     while (1) {
         if (SEND_MSG("Hello world") == PKG_TX_OK) {
@@ -134,6 +149,7 @@ int main(void) {
     screen_update();
     HAL_UART_Receive_IT(&huart1, rxBuffer, 1);
     prev_tick = HAL_GetTick();
+    last_beat_tick = prev_tick;
     while (1) {
         rx_status = pkg_recv(rx_buf);
         if (conn_status == CONN_ON) {
@@ -146,6 +162,7 @@ int main(void) {
                 case FIN_TYPE:
                     if (SEND_FIN() == PKG_TX_OK) {
                         conn_status = CONN_OFF;
+                        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
                         screen_write_ralign("Disconnected", RED);
                         screen_update();
                     }
@@ -153,8 +170,42 @@ int main(void) {
                 case ERR_TYPE:
                     is_stable = 0;
                     break;
+                case BEAT_TYPE:
+                    last_beat_tick = HAL_GetTick();
+                    beat_cnt = 0;
+                    break;
                 default:
                     break;
+            }
+
+            cur_tick = HAL_GetTick();
+            if (cur_tick - last_beat_tick >= HEARTBEAT_TIMEOUT) {
+                last_beat_tick = HAL_GetTick();
+                ++beat_cnt;
+            }
+            if (cur_tick - prev_tick >= HEARTBEAT_TIMEOUT) {
+                screen_write_lalign("SEND BEAT", BLUE);
+                screen_update();
+                if (SEND_BEAT() == PKG_TX_OK) {
+                    screen_write_lalign("BEAT OK", MAGENTA);
+                    screen_update();
+                    beat_cnt = 0;
+                    is_stable = 1;
+                } else {
+                    screen_write_lalign("BEAT ERR", RED);
+                    screen_update();
+                    ++beat_cnt;
+                    is_stable = 0;
+                }
+                prev_tick = cur_tick;
+            }
+            if (beat_cnt == 10) {
+                screen_write_lalign("NO HEARTBEAT. FORCE OFF", RED);
+                screen_update();
+                conn_status = CONN_OFF;
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+                screen_write_ralign("Disconnected", RED);
+                screen_update();
             }
         } else if (conn_status == CONN_OFF && rx_status == SYN_TYPE) {
             while (SEND_SYN() != PKG_TX_OK) {
@@ -163,25 +214,9 @@ int main(void) {
                 HAL_Delay(100);
             }
             conn_status = CONN_ON;
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
             screen_write_ralign("connected", RED);
             screen_update();
-        }
-        cur_tick = HAL_GetTick();
-        if (cur_tick - prev_tick >= HEARTBEAT_TIMEOUT) {
-            if (conn_status == CONN_ON) {
-                screen_write_lalign("SEND BEAT", BLUE);
-                screen_update();
-                if (SEND_BEAT() == PKG_TX_OK) {
-                    screen_write_lalign("BEAT OK", MAGENTA);
-                    screen_update();
-                    is_stable = 1;
-                } else {
-                    screen_write_lalign("BEAT ERR", RED);
-                    screen_update();
-                    is_stable = 0;
-                }
-            }
-            prev_tick = cur_tick;
         }
         HAL_Delay(100);
         /* USER CODE END WHILE */
@@ -191,6 +226,7 @@ int main(void) {
 #endif // __DEBUG
     /* USER CODE END 3 */
 }
+
 #pragma clang diagnostic pop
 
 /**
@@ -233,76 +269,34 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         static unsigned char uRx_Data[1024] = {0};
         static unsigned char uLength = 0;
         uRx_Data[uLength++] = rxBuffer[0];
-        HAL_UART_Transmit(&huart1, rxBuffer, 1, 0xffff);
+        HAL_UART_Transmit(&huart1, rxBuffer, 1, HAL_MAX_DELAY);
         if (rxBuffer[0] == '\n') {
-            if (uRx_Data[uLength - 1] == '\r') {
+            if (uRx_Data[uLength - 2] == '\r') {
+                uRx_Data[uLength - 2] = '\0';
+            } else {
                 uRx_Data[uLength - 1] = '\0';
-            } else {
-                uRx_Data[uLength] = '\0';
             }
-            if (SEND_MSG((char *) uRx_Data) == PKG_TX_OK) {
-                screen_write_ralign((const char *) uRx_Data, BLUE);
-            } else {
-                screen_write_ralign("Send failed", RED);
-            }
-            screen_update();
+            exec_command((const char *) uRx_Data);
+            show_address();
             uLength = 0;
         }
     }
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-    int i;
-//    HAL_Delay(400);
     switch (GPIO_Pin) {
         case GPIO_PIN_5:
             if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_5) == GPIO_PIN_RESET) {
                 screen_write_lalign("KEY0", BLUE);
                 screen_update();
-                if (conn_status == CONN_OFF) {
-                    screen_write_lalign("CONN: OFF->PENDING", BLUE);
-                    screen_update();
-                    conn_status = CONN_PENDING;
-                    for (i = 10; i > 0; i--) {
-                        if (conn_create(NULL, NULL) == CONN_ON) {
-                            break;
-                        }
-                    }
-                    if (i == 0) {
-                        conn_status = CONN_OFF;
-                        screen_write_lalign("CONN: PENDING->OFF", BLUE);
-                        screen_update();
-                    } else {
-                        conn_status = CONN_ON;
-                        screen_write_ralign("connected", RED);
-                        screen_update();
-                    }
-                }
+                handle_conn_create();
             }
             break;
         case GPIO_PIN_15:
             if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET) {
                 screen_write_lalign("KEY1", BLUE);
                 screen_update();
-                if (conn_status == CONN_ON) {
-                    screen_write_lalign("CONN: OFF->PENDING", BLUE);
-                    screen_update();
-                    conn_status = CONN_AWAIT;
-                    for (i = 10; i > 0; --i) {
-                        if (conn_close() == CONN_OFF) {
-                            break;
-                        }
-                    }
-                    if (i == 0) {
-                        screen_write_lalign("CONN: FORCE OFF", RED);
-                        screen_update();
-                        // Report ERROR?
-                    }
-                    // Force close?
-                    conn_status = CONN_OFF;
-                    screen_write_ralign("Disconnected", RED);
-                    screen_update();
-                }
+                handle_conn_close();
             }
             break;
         default:
@@ -328,6 +322,123 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
             }
         }
     }
+}
+
+void exec_command(const char *cmd) {
+    static uint8_t tmp[16];
+    if (memcmp(cmd, "send ", 5 * sizeof(char)) == 0) {
+        if (SEND_MSG((char *) (cmd + 5)) == PKG_TX_OK) {
+            screen_write_ralign((const char *) (cmd + 5), BLUE);
+        } else {
+            screen_write_ralign("Send failed", RED);
+        }
+        screen_update();
+    } else if (memcmp(cmd, "set ", 4 * sizeof(char)) == 0) {
+        if (memcmp(cmd + 4, "tx ", 3 * sizeof(char)) == 0) {
+            if (sscanf(cmd + 7, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8,
+                       tmp, tmp + 1, tmp + 2, tmp + 3, tmp + 4) != 5) {
+                HAL_UART_Transmit(&huart1, (uint8_t *) "Invalid address\r\n", 17, HAL_MAX_DELAY);
+            } else {
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+                for (int i = 0; i < 5; i++) {
+                    TX_ADDRESS[i] = tmp[i];
+                }
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+                conn_init();
+                UPDATE_ADDR();
+                screen_write_lalign("NRF24L01 OK", BLUE);
+                screen_update();
+            }
+        } else if (memcmp(cmd + 4, "rx ", 3 * sizeof(char)) == 0) {
+            if (sscanf(cmd + 7, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8,
+                       tmp, tmp + 1, tmp + 2, tmp + 3, tmp + 4) != 5) {
+                HAL_UART_Transmit(&huart1, (uint8_t *) "Invalid address\r\n", 17, HAL_MAX_DELAY);
+            } else {
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+                for (int i = 0; i < 5; i++) {
+                    RX_ADDRESS[i] = tmp[i];
+                }
+                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+                conn_init();
+                UPDATE_ADDR();
+                screen_write_lalign("NRF24L01 OK", BLUE);
+                screen_update();
+            }
+        } else {
+            HAL_UART_Transmit(&huart1, (uint8_t *) "Unknown command\r\n", 17, HAL_MAX_DELAY);
+        }
+    } else if (strcmp(cmd, "start") == 0) {
+        if (handle_conn_create() != 0) {
+            HAL_UART_Transmit(&huart1, (uint8_t *) "Connection is already on\r\n", 25, HAL_MAX_DELAY);
+        }
+    } else if (strcmp(cmd, "close") == 0) {
+        if (handle_conn_close() != 0) {
+            HAL_UART_Transmit(&huart1, (uint8_t *) "Connection is already off\r\n", 26, HAL_MAX_DELAY);
+        }
+    } else {
+        HAL_UART_Transmit(&huart1, (uint8_t *) "Unknown command\r\n", 17, HAL_MAX_DELAY);
+    }
+}
+
+int handle_conn_create(void) {
+    int i;
+    if (conn_status == CONN_OFF) {
+        screen_write_lalign("CONN: OFF->PENDING", BLUE);
+        screen_update();
+        conn_status = CONN_PENDING;
+        for (i = 10; i > 0; i--) {
+            if (conn_create() == CONN_ON) {
+                break;
+            }
+        }
+        if (i == 0) {
+            conn_status = CONN_OFF;
+            screen_write_lalign("CONN: PENDING->OFF", BLUE);
+            screen_update();
+        } else {
+            conn_status = CONN_ON;
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+            screen_write_ralign("connected", RED);
+            screen_update();
+        }
+        return 0;
+    }
+    return 1;
+}
+
+int handle_conn_close(void) {
+    int i;
+    if (conn_status == CONN_ON) {
+        screen_write_lalign("CONN: OFF->PENDING", BLUE);
+        screen_update();
+        conn_status = CONN_AWAIT;
+        for (i = 10; i > 0; --i) {
+            if (conn_close() == CONN_OFF) {
+                break;
+            }
+        }
+        if (i == 0) {
+            screen_write_lalign("CONN: FORCE OFF", RED);
+            screen_update();
+            // Report ERROR?
+        }
+        // Force close?
+        conn_status = CONN_OFF;
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+        screen_write_ralign("Disconnected", RED);
+        screen_update();
+        return 0;
+    }
+    return 1;
+}
+
+void show_address(void) {
+    char buf[32];
+    sprintf(buf, "TX: %02x%02x%02x%02x%02x", TX_ADDRESS[0], TX_ADDRESS[1], TX_ADDRESS[2], TX_ADDRESS[3], TX_ADDRESS[4]);
+    screen_write_lalign(buf, BLACK);
+    sprintf(buf, "RX: %02x%02x%02x%02x%02x", RX_ADDRESS[0], RX_ADDRESS[1], RX_ADDRESS[2], RX_ADDRESS[3], RX_ADDRESS[4]);
+    screen_write_lalign(buf, BLACK);
+    screen_update();
 }
 /* USER CODE END 4 */
 

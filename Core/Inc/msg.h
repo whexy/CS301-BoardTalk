@@ -52,7 +52,7 @@ typedef enum PKG_HEADER_TYPE {
 
 void conn_init(void);
 
-conn_type_typedef conn_create(const uint8_t *rx_addr, const uint8_t *tx_addr);
+conn_type_typedef conn_create();
 
 pkg_tx_typedef pkg_transmit(const char *msg, pkg_type_typedef type);
 

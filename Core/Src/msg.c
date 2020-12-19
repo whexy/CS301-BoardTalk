@@ -16,33 +16,23 @@ void conn_init(void) {
     NRF24L01_RX_Mode();
 }
 
-conn_type_typedef conn_create(const uint8_t *rx_addr, const uint8_t *tx_addr) {
+conn_type_typedef conn_create() {
     int i;
-    pkg_tx_typedef tx_status;
+    uint32_t start_tick;
     pkg_type_typedef rx_status;
     char buf[RX_PLOAD_WIDTH + 1];
-    if (rx_addr != NULL) {
-        for (i = 0; i < RX_ADR_WIDTH; ++i) {
-            RX_ADDRESS[i] = rx_addr[i];
-        }
-    }
-    if (tx_addr != NULL) {
-        for (i = 0; i < TX_ADR_WIDTH; ++i) {
-            TX_ADDRESS[i] = tx_addr[i];
-        }
-    }
-    tx_status = SEND_SYN();
-    if (tx_status == PKG_TX_OK) {
+    if (SEND_SYN() == PKG_TX_OK) {
         screen_write_lalign("SYN OK", GREEN);
         screen_update();
         for (i = 10; i > 0; --i) {
+            start_tick = HAL_GetTick();
             do {
                 screen_write_lalign("RECVING", RED);
                 screen_update();
                 rx_status = pkg_recv(buf);
                 screen_write_lalign("GOT A PKG", RED);
                 screen_update();
-            } while (rx_status == EMPTY);
+            } while (rx_status == EMPTY && HAL_GetTick() - start_tick <= 1000);
             screen_write_lalign("OUT LOOP", RED);
             screen_update();
             if (rx_status == SYN_TYPE) {
@@ -68,12 +58,14 @@ conn_type_typedef conn_create(const uint8_t *rx_addr, const uint8_t *tx_addr) {
 pkg_tx_typedef pkg_transmit(const char *msg, pkg_type_typedef type) {
     char buf[TX_PLOAD_WIDTH + 1];
     pkg_tx_typedef status = PKG_TX_OK;
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_RESET);
     sprintf(buf, "#%1d:%s", type, msg);
     NRF24L01_TX_Mode();
     if (NRF24L01_TxPacket((uint8_t *) buf) != TX_OK) {
         status = PKG_TX_FAIL;
     }
     NRF24L01_RX_Mode();
+    HAL_GPIO_WritePin(GPIOD, GPIO_PIN_2, GPIO_PIN_SET);
     return status;
 }
 
@@ -117,19 +109,21 @@ pkg_type_typedef pkg_recv(char *buf) {
 
 conn_type_typedef conn_close(void) {
     int i;
+    uint32_t start_tick;
     pkg_type_typedef rx_status;
     char buf[RX_PLOAD_WIDTH + 1];
     if (SEND_FIN() == PKG_TX_OK) {
         screen_write_lalign("FIN OK", GREEN);
         screen_update();
         for (i = 10; i > 0; --i) {
+            start_tick = HAL_GetTick();
             do {
                 screen_write_lalign("RECVING", RED);
                 screen_update();
                 rx_status = pkg_recv(buf);
                 screen_write_lalign("GOT A PKG", RED);
                 screen_update();
-            } while (rx_status == EMPTY);
+            } while (rx_status == EMPTY && HAL_GetTick() - start_tick <= 1000);
             if (rx_status == FIN_TYPE) {
                 break;
             }
