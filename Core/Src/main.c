@@ -53,6 +53,7 @@
 
 /* USER CODE BEGIN PV */
 uint8_t rxBuffer[20];
+char debug_buf[2048];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -333,39 +334,29 @@ void exec_command(const char *cmd) {
             screen_write_ralign("Send failed", RED);
         }
         screen_update();
-    } else if (memcmp(cmd, "set ", 4 * sizeof(char)) == 0) {
-        if (memcmp(cmd + 4, "tx ", 3 * sizeof(char)) == 0) {
-            if (sscanf(cmd + 7, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8,
-                       tmp, tmp + 1, tmp + 2, tmp + 3, tmp + 4) != 5) {
-                HAL_UART_Transmit(&huart1, (uint8_t *) "Invalid address\r\n", 17, HAL_MAX_DELAY);
-            } else {
-                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-                for (int i = 0; i < 5; i++) {
-                    TX_ADDRESS[i] = tmp[i];
-                }
-                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-                conn_init();
-                UPDATE_ADDR();
-                screen_write_lalign("NRF24L01 OK", BLUE);
-                screen_update();
-            }
-        } else if (memcmp(cmd + 4, "rx ", 3 * sizeof(char)) == 0) {
-            if (sscanf(cmd + 7, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8,
-                       tmp, tmp + 1, tmp + 2, tmp + 3, tmp + 4) != 5) {
-                HAL_UART_Transmit(&huart1, (uint8_t *) "Invalid address\r\n", 17, HAL_MAX_DELAY);
-            } else {
-                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-                for (int i = 0; i < 5; i++) {
-                    RX_ADDRESS[i] = tmp[i];
-                }
-                HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-                conn_init();
-                UPDATE_ADDR();
-                screen_write_lalign("NRF24L01 OK", BLUE);
-                screen_update();
-            }
+    } else if (memcmp(cmd, "setaddr ", 8 * sizeof(char)) == 0) {
+        if (sscanf(cmd + 7, "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8 "%2" SCNx8,
+                   tmp, tmp + 1, tmp + 2, tmp + 3, tmp + 4) != 5) {
+            HAL_UART_Transmit(&huart1, (uint8_t *) "Invalid address\r\n", 17, HAL_MAX_DELAY);
         } else {
-            HAL_UART_Transmit(&huart1, (uint8_t *) "Unknown command\r\n", 17, HAL_MAX_DELAY);
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+            for (int i = 0; i < 5; i++) {
+                TX_ADDRESS[i] = tmp[i];
+                RX_ADDRESS[i] = tmp[i];
+            }
+            NRF24L01_Write_Buf(NRF_WRITE_REG + TX_ADDR, (uint8_t *) TX_ADDRESS, TX_ADR_WIDTH);//写TX节点地址
+            NRF24L01_Write_Buf(NRF_WRITE_REG + RX_ADDR_P0, (uint8_t *) RX_ADDRESS, RX_ADR_WIDTH); //设置TX节点地址,主要为了使能ACK
+            HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+//                conn_init();
+//                UPDATE_ADDR();
+//                uint8_t _status = NRF24L01_Read_Buf(NRF_READ_REG + TX_ADDR, (uint8_t *) tx_tmp, TX_ADR_WIDTH);
+//                sprintf(debug_buf, "%x, %02x%02x%02x%02x%02x", _status, tx_tmp[0], tx_tmp[1], tx_tmp[2], tx_tmp[3], tx_tmp[4]);
+//                screen_write_lalign(debug_buf, BLACK);
+//                _status = NRF24L01_Read_Buf(NRF_READ_REG + RX_ADDR_P0, (uint8_t *) rx_tmp, RX_ADR_WIDTH);
+//                sprintf(debug_buf, "%x, %02x%02x%02x%02x%02x", _status, rx_tmp[0], rx_tmp[1], rx_tmp[2], rx_tmp[3], rx_tmp[4]);
+//                screen_write_lalign(debug_buf, BLACK);
+            screen_write_lalign("NRF24L01 OK", BLUE);
+            screen_update();
         }
     } else if (strcmp(cmd, "start") == 0) {
         if (handle_conn_create() != 0) {

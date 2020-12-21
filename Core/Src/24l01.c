@@ -183,6 +183,7 @@ uint8_t NRF24L01_RxPacket(uint8_t *rxbuf) {
 void NRF24L01_RX_Mode(void) {
 //    NRF24L01_CE = 0;
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+    NRF24L01_Write_Buf(NRF_WRITE_REG + TX_ADDR, (uint8_t *) TX_ADDRESS, TX_ADR_WIDTH);//写TX节点地址
     NRF24L01_Write_Buf(NRF_WRITE_REG + RX_ADDR_P0, (uint8_t *) RX_ADDRESS, RX_ADR_WIDTH);//写RX节点地址
 
     NRF24L01_Write_Reg(NRF_WRITE_REG + EN_AA, 0x01);       //使能通道0的自动应答
